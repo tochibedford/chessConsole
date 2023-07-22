@@ -276,6 +276,18 @@ class Board {
           }
         }
         break;
+      case "knight":
+        // above
+        this._highlightedMoves.push({ row: row - 2, col: col - 1 });
+        this._highlightedMoves.push({ row: row - 2, col: col + 1 });
+        this._highlightedMoves.push({ row: row - 1, col: col - 2 });
+        this._highlightedMoves.push({ row: row - 1, col: col + 2 });
+        //below
+        this._highlightedMoves.push({ row: row + 2, col: col + 1 });
+        this._highlightedMoves.push({ row: row + 2, col: col - 1 });
+        this._highlightedMoves.push({ row: row + 1, col: col - 2 });
+        this._highlightedMoves.push({ row: row + 1, col: col + 2 });
+        break;
       case "queen":
         for (let i = 1; i <= 8; i++) {
           this._highlightedMoves.push({ row: i, col });
