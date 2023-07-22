@@ -102,10 +102,6 @@ class Board {
   private _highlightedMoves: { row: number; col: number }[] = [];
   private _debugList: any[] = [];
 
-  constructor() {
-    this.arrangeBoard();
-  }
-
   get rawBoard() {
     return this._board;
   }
@@ -215,6 +211,7 @@ class Board {
 
   deselectCells() {
     this._selectedCell = undefined;
+    this._highlightedMoves.splice(0, this._highlightedMoves.length);
   }
 
   selectHighlightedCell() {
@@ -261,6 +258,22 @@ class Board {
           this._highlightedMoves.push({ row: i, col });
           this._highlightedMoves.push({ row, col: i });
         }
+      case "bishop":
+        for (let i = 1; i <= 8; i++) {
+          if (row - i >= 1 && col - i >= 1) {
+            this._highlightedMoves.push({ row: row - i, col: col - i });
+          }
+          if (row - i >= 1 && col + i <= 8) {
+            this._highlightedMoves.push({ row: row - i, col: col + i });
+          }
+          if (row + i <= 8 && col - i >= 1) {
+            this._highlightedMoves.push({ row: row + i, col: col - i });
+          }
+          if (row + i <= 8 && col + i <= 8) {
+            this._highlightedMoves.push({ row: row + i, col: col + i });
+          }
+        }
+        break;
       default:
         break;
     }
@@ -304,6 +317,7 @@ function selectCellString(cellString: string) {
 }
 
 const newBoard = new Board();
+newBoard.arrangeBoard();
 console.log(newBoard.drawBoard());
 console.log(newBoard.highlightedCell);
 
