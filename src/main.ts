@@ -277,7 +277,7 @@ function highlightPossibleMove(cellString: string) {
 }
 
 function selectCellString(cellString: string) {
-  return chalk.bold(chalk.magenta(chalk.bgYellow(cellString)));
+  return chalk.bold(chalk.white(chalk.bgGreen(cellString)));
 }
 
 const newBoard = new Board();
