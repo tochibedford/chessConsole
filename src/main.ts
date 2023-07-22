@@ -26,6 +26,7 @@ class Piece {
   private _color: IColor;
   private _notation: INotation;
   private _canJump: boolean = false;
+  private _hasMovedOnce: boolean = false;
 
   constructor(name: IName, color: IColor) {
     this._name = name;
@@ -87,6 +88,10 @@ class Piece {
 
   get canJump() {
     return this._canJump;
+  }
+
+  get hasMovedOnce() {
+    return this._hasMovedOnce;
   }
 }
 
@@ -240,6 +245,24 @@ class Board {
     this._highlightedMoves.splice(0, this._highlightedMoves.length);
     if (!this._selectedCell) {
       return;
+    }
+
+    const { row, col } = this._selectedCell;
+    switch (cell.name) {
+      case "pawn":
+        const direction = cell.color === "white" ? 1 : -1;
+        if (!cell.hasMovedOnce) {
+          this._highlightedMoves.push({ row: row - 2 * direction, col });
+        }
+        this._highlightedMoves.push({ row: row - 1 * direction, col });
+        break;
+      case "rook":
+        for (let i = 1; i <= 8; i++) {
+          this._highlightedMoves.push({ row: i, col });
+          this._highlightedMoves.push({ row, col: i });
+        }
+      default:
+        break;
     }
   }
 
