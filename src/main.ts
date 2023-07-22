@@ -25,7 +25,6 @@ class Piece {
   private _name: IName;
   private _color: IColor;
   private _notation: INotation;
-  private _moves: Move[] = [];
   private _canJump: boolean = false;
 
   constructor(name: IName, color: IColor) {
@@ -61,7 +60,6 @@ class Piece {
       default:
         throw Error("Invalid Chess Piece Name");
     }
-    this.initMoves();
   }
 
   private _getNotation(name: IName, wName: INotation, bName: INotation) {
@@ -87,21 +85,8 @@ class Piece {
     return this._name;
   }
 
-  get moves() {
-    return this._moves;
-  }
-
   get canJump() {
     return this._canJump;
-  }
-
-  initMoves() {
-    switch (this.name) {
-      case "pawn":
-        // this._moves.push(new Move("vertical", 1));
-        // this._moves.push(new Move("vertical", 2));
-        this._moves.push(new Move("diagonal", 1));
-    }
   }
 }
 
@@ -110,82 +95,11 @@ type Vector = {
   y: 1 | 0 | -1 | 2 | -2 | 3 | -3;
 };
 
-class Move {
-  private _vectors: Vector[] = [];
-  private _length: number;
-  private _name: string;
-
-  constructor(
-    name: "horizontal" | "vertical" | "diagonal" | "L",
-    length: number,
-    biDirectional: boolean = false
-  ) {
-    this._length = length;
-    this._name = name;
-    let v;
-    switch (name) {
-      case "horizontal":
-        v = { x: 1, y: 0 } as const;
-        this._vectors.push(v);
-        if (biDirectional) {
-          this._vectors.push(invertVector(v));
-        }
-        break;
-      case "vertical":
-        v = { x: 0, y: 1 } as const;
-        this._vectors.push(v);
-        if (biDirectional) {
-          this._vectors.push(invertVector(v));
-        }
-        break;
-      case "diagonal":
-        v = { x: 1, y: 1 } as const;
-        this._vectors.push(v);
-        if (biDirectional) {
-          this._vectors.push(invertVector(v));
-        }
-        break;
-      case "L":
-        if (this._length > 1) {
-          throw Error("Length must be 1 is move is an L");
-        }
-        this._vectors.push({ x: 2, y: 1 });
-        this._vectors.push({ x: -2, y: 1 });
-        this._vectors.push({ x: 1, y: 2 });
-        this._vectors.push({ x: -1, y: 2 });
-        if (biDirectional) {
-          const vs = [...this._vectors];
-          vs.forEach((item) => {
-            this._vectors.push(invertVector(item));
-          });
-        }
-        break;
-      default:
-        throw Error(
-          "Invalid move type moves can only be: horizontal, vertical, diagonal or L"
-        );
-    }
-  }
-
-  get vectors() {
-    return this._vectors;
-  }
-
-  get length() {
-    return this._length;
-  }
-
-  get name() {
-    return this._name;
-  }
-}
-
 class Board {
   private _board = new Array<0 | Piece>(8 * 8).fill(0);
   private _highlightedCell: { row: number; col: number } = { row: 7, col: 5 };
   private _selectedCell: { row: number; col: number } | undefined;
   private _highlightedMoves: { row: number; col: number }[] = [];
-  private _possibleMoves: Move[] = [];
   private _debugList: any[] = [];
 
   constructor() {
@@ -332,32 +246,6 @@ class Board {
     if (!this._selectedCell) {
       return;
     }
-    const selectedCell = this._selectedCell;
-    let newPos;
-    switch (cell.color) {
-      case "white":
-        cell.moves.forEach((move) => {
-          move.vectors.forEach((vector) => {
-            newPos = subtractVectorFromPoint(
-              selectedCell,
-              multiplyVector(vector, move.length)
-            );
-            for (let row = selectedCell.row; row >= newPos.row; row--) {
-              for (let col = selectedCell.col; col >= newPos.col; col--) {
-                this._highlightedMoves.push({ row, col });
-              }
-            }
-          });
-        });
-
-        break;
-      case "black":
-        newPos = addVectorToPoint(this._selectedCell, cell.moves[0].vectors[0]);
-        break;
-      default:
-        break;
-    }
-    // this._debugList.push(`\n(row: ${newPos?.row}, col:${newPos?.col})`);
   }
 
   moveUp() {
