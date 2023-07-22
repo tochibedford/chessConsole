@@ -233,7 +233,6 @@ class Board {
         ];
       if (cell !== 0) {
         this.highlightMoves(cell);
-        // this._debugList.push(cell.moves.map((x) => x.name + x.vectors));
       }
     }
   }
@@ -258,8 +257,27 @@ class Board {
           this._highlightedMoves.push({ row: i, col });
           this._highlightedMoves.push({ row, col: i });
         }
+        break;
       case "bishop":
         for (let i = 1; i <= 8; i++) {
+          if (row - i >= 1 && col - i >= 1) {
+            this._highlightedMoves.push({ row: row - i, col: col - i });
+          }
+          if (row - i >= 1 && col + i <= 8) {
+            this._highlightedMoves.push({ row: row - i, col: col + i });
+          }
+          if (row + i <= 8 && col - i >= 1) {
+            this._highlightedMoves.push({ row: row + i, col: col - i });
+          }
+          if (row + i <= 8 && col + i <= 8) {
+            this._highlightedMoves.push({ row: row + i, col: col + i });
+          }
+        }
+        break;
+      case "queen":
+        for (let i = 1; i <= 8; i++) {
+          this._highlightedMoves.push({ row: i, col });
+          this._highlightedMoves.push({ row, col: i });
           if (row - i >= 1 && col - i >= 1) {
             this._highlightedMoves.push({ row: row - i, col: col - i });
           }
