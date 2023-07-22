@@ -90,11 +90,6 @@ class Piece {
   }
 }
 
-type Vector = {
-  x: 1 | 0 | -1 | 2 | -2 | 3 | -3;
-  y: 1 | 0 | -1 | 2 | -2 | 3 | -3;
-};
-
 class Board {
   private _board = new Array<0 | Piece>(8 * 8).fill(0);
   private _highlightedCell: { row: number; col: number } = { row: 7, col: 5 };
@@ -283,25 +278,6 @@ function highlightPossibleMove(cellString: string) {
 
 function selectCellString(cellString: string) {
   return chalk.bold(chalk.magenta(chalk.bgYellow(cellString)));
-}
-
-function invertVector(v: Vector) {
-  return { x: -v.x, y: -v.y } as Vector;
-}
-
-function addVectorToPoint(point: { row: number; col: number }, vector: Vector) {
-  return { col: point.col + vector.x, row: point.row + vector.y };
-}
-
-function multiplyVector(vector: Vector, factor: number) {
-  return { x: factor * vector.x, y: factor * vector.y } as Vector;
-}
-
-function subtractVectorFromPoint(
-  point: { row: number; col: number },
-  vector: Vector
-) {
-  return { col: point.col - vector.x, row: point.row - vector.y };
 }
 
 const newBoard = new Board();
