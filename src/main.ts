@@ -246,11 +246,13 @@ class Board {
     const { row, col } = this._selectedCell;
     switch (cell.name) {
       case "pawn":
-        const direction = cell.color === "white" ? 1 : -1;
-        if (!cell.hasMovedOnce) {
-          this._highlightedMoves.push({ row: row - 2 * direction, col });
+        {
+          const direction = cell.color === "white" ? 1 : -1;
+          if (!cell.hasMovedOnce) {
+            this._highlightedMoves.push({ row: row - 2 * direction, col });
+          }
+          this._highlightedMoves.push({ row: row - 1 * direction, col });
         }
-        this._highlightedMoves.push({ row: row - 1 * direction, col });
         break;
       case "rook":
         for (let i = 1; i <= 8; i++) {
@@ -290,6 +292,18 @@ class Board {
           if (row + i <= 8 && col + i <= 8) {
             this._highlightedMoves.push({ row: row + i, col: col + i });
           }
+        }
+        break;
+      case "king":
+        {
+          this._highlightedMoves.push({ row: row - 1, col });
+          this._highlightedMoves.push({ row: row + 1, col });
+          this._highlightedMoves.push({ row, col: col - 1 });
+          this._highlightedMoves.push({ row, col: col + 1 });
+          this._highlightedMoves.push({ row: row - 1, col: col - 1 });
+          this._highlightedMoves.push({ row: row - 1, col: col + 1 });
+          this._highlightedMoves.push({ row: row + 1, col: col - 1 });
+          this._highlightedMoves.push({ row: row + 1, col: col + 1 });
         }
         break;
       default:
