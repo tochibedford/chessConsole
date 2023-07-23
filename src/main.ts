@@ -96,7 +96,7 @@ class Piece {
 }
 
 class Board {
-  private _board = new Array<0 | Piece>(8 * 8).fill(0);
+  public _board = new Array<0 | Piece>(8 * 8).fill(0);
   private _highlightedCell: { row: number; col: number } = { row: 7, col: 5 };
   private _selectedCell: { row: number; col: number } | undefined;
   private _highlightedMoves: { row: number; col: number }[] = [];
@@ -255,8 +255,44 @@ class Board {
         }
         break;
       case "rook":
-        for (let i = 1; i <= 8; i++) {
+        for (let i = row - 1; i >= 1; i--) {
+          const lookahead = this._board[convertIndex21(i, col)];
+          if (lookahead !== 0) {
+            if (lookahead.color !== cell.color) {
+              this._highlightedMoves.push({ row: i, col });
+            }
+            break;
+          }
           this._highlightedMoves.push({ row: i, col });
+        }
+        for (let i = row + 1; i <= 8; i++) {
+          const lookahead = this._board[convertIndex21(i, col)];
+          if (lookahead !== 0) {
+            if (lookahead.color !== cell.color) {
+              this._highlightedMoves.push({ row: i, col });
+            }
+            break;
+          }
+          this._highlightedMoves.push({ row: i, col });
+        }
+        for (let i = col - 1; i >= 1; i--) {
+          const lookahead = this._board[convertIndex21(row, i)];
+          if (lookahead !== 0) {
+            if (lookahead.color !== cell.color) {
+              this._highlightedMoves.push({ row, col: i });
+            }
+            break;
+          }
+          this._highlightedMoves.push({ row, col: i });
+        }
+        for (let i = col + 1; i <= 8; i++) {
+          const lookahead = this._board[convertIndex21(row, i)];
+          if (lookahead !== 0) {
+            if (lookahead.color !== cell.color) {
+              this._highlightedMoves.push({ row, col: i });
+            }
+            break;
+          }
           this._highlightedMoves.push({ row, col: i });
         }
         break;
