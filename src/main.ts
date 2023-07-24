@@ -255,45 +255,17 @@ class Board {
         }
         break;
       case "rook":
-        for (let i = row - 1; i >= 1; i--) {
-          const lookahead = this._board[convert2DIndexTo1D(i, col)];
-          if (lookahead !== 0) {
-            if (lookahead.color !== cell.color) {
-              this._highlightedMoves.push({ row: i, col });
-            }
-            break;
-          }
-          this._highlightedMoves.push({ row: i, col });
-        }
-        for (let i = row + 1; i <= 8; i++) {
-          const lookahead = this._board[convert2DIndexTo1D(i, col)];
-          if (lookahead !== 0) {
-            if (lookahead.color !== cell.color) {
-              this._highlightedMoves.push({ row: i, col });
-            }
-            break;
-          }
-          this._highlightedMoves.push({ row: i, col });
-        }
-        for (let i = col - 1; i >= 1; i--) {
-          const lookahead = this._board[convert2DIndexTo1D(row, i)];
-          if (lookahead !== 0) {
-            if (lookahead.color !== cell.color) {
-              this._highlightedMoves.push({ row, col: i });
-            }
-            break;
-          }
-          this._highlightedMoves.push({ row, col: i });
-        }
-        for (let i = col + 1; i <= 8; i++) {
-          const lookahead = this._board[convert2DIndexTo1D(row, i)];
-          if (lookahead !== 0) {
-            if (lookahead.color !== cell.color) {
-              this._highlightedMoves.push({ row, col: i });
-            }
-            break;
-          }
-          this._highlightedMoves.push({ row, col: i });
+        {
+          const { top, right, bottom, left } = this.calculatePaths(
+            cell,
+            this._selectedCell
+          );
+          this._highlightedMoves = this._highlightedMoves.concat(
+            top,
+            right,
+            bottom,
+            left
+          );
         }
         break;
       case "bishop":
@@ -343,20 +315,113 @@ class Board {
         }
         break;
       case "king":
+        // {
+        //   this._highlightedMoves.push({ row: row - 1, col });
+        //   this._highlightedMoves.push({ row: row + 1, col });
+        //   this._highlightedMoves.push({ row, col: col - 1 });
+        //   this._highlightedMoves.push({ row, col: col + 1 });
+        //   this._highlightedMoves.push({ row: row - 1, col: col - 1 });
+        //   this._highlightedMoves.push({ row: row - 1, col: col + 1 });
+        //   this._highlightedMoves.push({ row: row + 1, col: col - 1 });
+        //   this._highlightedMoves.push({ row: row + 1, col: col + 1 });
+        // }
         {
-          this._highlightedMoves.push({ row: row - 1, col });
-          this._highlightedMoves.push({ row: row + 1, col });
-          this._highlightedMoves.push({ row, col: col - 1 });
-          this._highlightedMoves.push({ row, col: col + 1 });
-          this._highlightedMoves.push({ row: row - 1, col: col - 1 });
-          this._highlightedMoves.push({ row: row - 1, col: col + 1 });
-          this._highlightedMoves.push({ row: row + 1, col: col - 1 });
-          this._highlightedMoves.push({ row: row + 1, col: col + 1 });
+          const { top, right, bottom, left } = this.calculatePaths(
+            cell,
+            this._selectedCell,
+            true
+          );
+          this._highlightedMoves = this._highlightedMoves.concat(
+            top,
+            right,
+            bottom,
+            left
+          );
         }
         break;
       default:
         break;
     }
+  }
+
+  calculatePaths<T>(
+    cell: Piece,
+    selectedCell: { row: number; col: number },
+    singleStep: boolean = false
+  ) {
+    const { row, col } = selectedCell;
+    type IPaths = { row: number; col: number };
+    const paths: {
+      [K: string]: { row: number; col: number }[];
+    } = {
+      top: [],
+      right: [],
+      bottom: [],
+      left: [],
+      topLeft: [],
+      topRight: [],
+      bottomLeft: [],
+      bottomRight: [],
+    };
+
+    //top
+    for (let i = row - 1; i >= 1; i--) {
+      const lookahead = this._board[convert2DIndexTo1D(i, col)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.top.push({ row: i, col });
+        }
+        break;
+      }
+      paths.top.push({ row: i, col });
+      if (singleStep) {
+        break;
+      }
+    }
+    // bottom
+    for (let i = row + 1; i <= 8; i++) {
+      const lookahead = this._board[convert2DIndexTo1D(i, col)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.bottom.push({ row: i, col });
+        }
+        break;
+      }
+      paths.bottom.push({ row: i, col });
+      if (singleStep) {
+        break;
+      }
+    }
+    // left
+    for (let i = col - 1; i >= 1; i--) {
+      const lookahead = this._board[convert2DIndexTo1D(row, i)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.left.push({ row, col: i });
+        }
+        break;
+      }
+      paths.left.push({ row, col: i });
+      if (singleStep) {
+        break;
+      }
+    }
+    // right
+    for (let i = col + 1; i <= 8; i++) {
+      const lookahead = this._board[convert2DIndexTo1D(row, i)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.right.push({ row, col: i });
+        }
+        break;
+      }
+      paths.right.push({ row, col: i });
+      if (singleStep) {
+        break;
+      }
+    }
+
+    return paths;
   }
 
   moveUp() {
@@ -398,6 +463,8 @@ function selectCellString(cellString: string) {
 
 const newBoard = new Board();
 newBoard.arrangeBoard();
+newBoard._board[55] = 0;
+newBoard._board[45] = new Piece("king", "white");
 console.log(newBoard.drawBoard());
 console.log(newBoard.highlightedCell);
 
