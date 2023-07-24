@@ -128,25 +128,25 @@ class Board {
     //black mercernaries
     for (let col = 1; col <= 8; col++) {
       const piece = new Piece(arrangement[col - 1], "black");
-      this._board[convertIndex21(1, col)] = piece;
+      this._board[convert2DIndexTo1D(1, col)] = piece;
     }
 
     //black pawns
     for (let col = 1; col <= 8; col++) {
       const piece = new Piece("pawn", "black");
-      this._board[convertIndex21(2, col)] = piece;
+      this._board[convert2DIndexTo1D(2, col)] = piece;
     }
 
     //white pawns
     for (let col = 1; col <= 8; col++) {
       const piece = new Piece("pawn", "white");
-      this._board[convertIndex21(7, col)] = piece;
+      this._board[convert2DIndexTo1D(7, col)] = piece;
     }
 
     //white mercernaries
     for (let col = 1; col <= 8; col++) {
       const piece = new Piece(arrangement[col - 1], "white");
-      this._board[convertIndex21(8, col)] = piece;
+      this._board[convert2DIndexTo1D(8, col)] = piece;
     }
   }
 
@@ -216,7 +216,7 @@ class Board {
 
   selectHighlightedCell() {
     const { row, col } = this._highlightedCell;
-    const index1D = convertIndex21(row, col);
+    const index1D = convert2DIndexTo1D(row, col);
     if (
       !!this._selectedCell &&
       row === this._selectedCell.row &&
@@ -229,7 +229,7 @@ class Board {
       this._selectedCell = { row, col };
       const cell =
         this._board[
-          convertIndex21(this._selectedCell.row, this._selectedCell.col)
+          convert2DIndexTo1D(this._selectedCell.row, this._selectedCell.col)
         ];
       if (cell !== 0) {
         this.highlightMoves(cell);
@@ -256,7 +256,7 @@ class Board {
         break;
       case "rook":
         for (let i = row - 1; i >= 1; i--) {
-          const lookahead = this._board[convertIndex21(i, col)];
+          const lookahead = this._board[convert2DIndexTo1D(i, col)];
           if (lookahead !== 0) {
             if (lookahead.color !== cell.color) {
               this._highlightedMoves.push({ row: i, col });
@@ -266,7 +266,7 @@ class Board {
           this._highlightedMoves.push({ row: i, col });
         }
         for (let i = row + 1; i <= 8; i++) {
-          const lookahead = this._board[convertIndex21(i, col)];
+          const lookahead = this._board[convert2DIndexTo1D(i, col)];
           if (lookahead !== 0) {
             if (lookahead.color !== cell.color) {
               this._highlightedMoves.push({ row: i, col });
@@ -276,7 +276,7 @@ class Board {
           this._highlightedMoves.push({ row: i, col });
         }
         for (let i = col - 1; i >= 1; i--) {
-          const lookahead = this._board[convertIndex21(row, i)];
+          const lookahead = this._board[convert2DIndexTo1D(row, i)];
           if (lookahead !== 0) {
             if (lookahead.color !== cell.color) {
               this._highlightedMoves.push({ row, col: i });
@@ -286,7 +286,7 @@ class Board {
           this._highlightedMoves.push({ row, col: i });
         }
         for (let i = col + 1; i <= 8; i++) {
-          const lookahead = this._board[convertIndex21(row, i)];
+          const lookahead = this._board[convert2DIndexTo1D(row, i)];
           if (lookahead !== 0) {
             if (lookahead.color !== cell.color) {
               this._highlightedMoves.push({ row, col: i });
@@ -376,7 +376,7 @@ class Board {
   }
 }
 
-function convertIndex21(row: number, col: number) {
+function convert2DIndexTo1D(row: number, col: number) {
   return (row - 1) * 8 + col - 1;
 }
 
