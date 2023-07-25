@@ -293,21 +293,27 @@ class Board {
         this._highlightedMoves.push({ row: row + 1, col: col + 2 });
         break;
       case "queen":
-        for (let i = 1; i <= 8; i++) {
-          this._highlightedMoves.push({ row: i, col });
-          this._highlightedMoves.push({ row, col: i });
-          if (row - i >= 1 && col - i >= 1) {
-            this._highlightedMoves.push({ row: row - i, col: col - i });
-          }
-          if (row - i >= 1 && col + i <= 8) {
-            this._highlightedMoves.push({ row: row - i, col: col + i });
-          }
-          if (row + i <= 8 && col - i >= 1) {
-            this._highlightedMoves.push({ row: row + i, col: col - i });
-          }
-          if (row + i <= 8 && col + i <= 8) {
-            this._highlightedMoves.push({ row: row + i, col: col + i });
-          }
+        {
+          const {
+            top,
+            right,
+            bottom,
+            left,
+            topRight,
+            topLeft,
+            bottomLeft,
+            bottomRight,
+          } = this.calculatePaths(cell, this._selectedCell);
+          this._highlightedMoves = this._highlightedMoves.concat(
+            top,
+            right,
+            bottom,
+            left,
+            topLeft,
+            topRight,
+            bottomLeft,
+            bottomRight
+          );
         }
         break;
       case "king":
