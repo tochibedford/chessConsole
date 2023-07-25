@@ -19,7 +19,7 @@ type INotation =
   | "X"
   | "Y"
   | "Z";
-
+type IBoardCoordinate = { row: number; col: number }; //1-indexed
 class Piece {
   private _score: number;
   private _name: IName;
@@ -97,9 +97,9 @@ class Piece {
 
 class Board {
   public _board = new Array<0 | Piece>(8 * 8).fill(0);
-  private _highlightedCell: { row: number; col: number } = { row: 7, col: 5 };
-  private _selectedCell: { row: number; col: number } | undefined;
-  private _highlightedMoves: { row: number; col: number }[] = [];
+  private _highlightedCell: IBoardCoordinate = { row: 7, col: 5 };
+  private _selectedCell: IBoardCoordinate | undefined;
+  private _highlightedMoves: IBoardCoordinate[] = [];
   private _debugList: any[] = [];
 
   get rawBoard() {
@@ -269,19 +269,15 @@ class Board {
         }
         break;
       case "bishop":
-        for (let i = 1; i <= 8; i++) {
-          if (row - i >= 1 && col - i >= 1) {
-            this._highlightedMoves.push({ row: row - i, col: col - i });
-          }
-          if (row - i >= 1 && col + i <= 8) {
-            this._highlightedMoves.push({ row: row - i, col: col + i });
-          }
-          if (row + i <= 8 && col - i >= 1) {
-            this._highlightedMoves.push({ row: row + i, col: col - i });
-          }
-          if (row + i <= 8 && col + i <= 8) {
-            this._highlightedMoves.push({ row: row + i, col: col + i });
-          }
+        {
+          const { topLeft, topRight, bottomLeft, bottomRight } =
+            this.calculatePaths(cell, this._selectedCell);
+          this._highlightedMoves = this._highlightedMoves.concat(
+            topLeft,
+            topRight,
+            bottomLeft,
+            bottomRight
+          );
         }
         break;
       case "knight":
@@ -315,27 +311,26 @@ class Board {
         }
         break;
       case "king":
-        // {
-        //   this._highlightedMoves.push({ row: row - 1, col });
-        //   this._highlightedMoves.push({ row: row + 1, col });
-        //   this._highlightedMoves.push({ row, col: col - 1 });
-        //   this._highlightedMoves.push({ row, col: col + 1 });
-        //   this._highlightedMoves.push({ row: row - 1, col: col - 1 });
-        //   this._highlightedMoves.push({ row: row - 1, col: col + 1 });
-        //   this._highlightedMoves.push({ row: row + 1, col: col - 1 });
-        //   this._highlightedMoves.push({ row: row + 1, col: col + 1 });
-        // }
         {
-          const { top, right, bottom, left } = this.calculatePaths(
-            cell,
-            this._selectedCell,
-            true
-          );
+          const {
+            top,
+            right,
+            bottom,
+            left,
+            topRight,
+            topLeft,
+            bottomLeft,
+            bottomRight,
+          } = this.calculatePaths(cell, this._selectedCell, true);
           this._highlightedMoves = this._highlightedMoves.concat(
             top,
             right,
             bottom,
-            left
+            left,
+            topLeft,
+            topRight,
+            bottomLeft,
+            bottomRight
           );
         }
         break;
@@ -346,13 +341,20 @@ class Board {
 
   calculatePaths<T>(
     cell: Piece,
-    selectedCell: { row: number; col: number },
+    selectedCell: IBoardCoordinate,
     singleStep: boolean = false
   ) {
     const { row, col } = selectedCell;
-    type IPaths = { row: number; col: number };
     const paths: {
-      [K: string]: { row: number; col: number }[];
+      [K in
+        | "top"
+        | "right"
+        | "bottom"
+        | "left"
+        | "topLeft"
+        | "topRight"
+        | "bottomLeft"
+        | "bottomRight"]: IBoardCoordinate[];
     } = {
       top: [],
       right: [],
@@ -421,6 +423,79 @@ class Board {
       }
     }
 
+    let i, j;
+    // topLeft
+    (i = row), (j = col);
+    while (i > 1 && j > 1) {
+      i--;
+      j--;
+      const lookahead = this._board[convert2DIndexTo1D(i, j)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.topLeft.push({ row: i, col: j });
+        }
+        break;
+      }
+      paths.topLeft.push({ row: i, col: j });
+      if (singleStep) {
+        break;
+      }
+    }
+
+    // topRight
+    (i = row), (j = col);
+    while (i > 1 && j < 8) {
+      i--;
+      j++;
+      const lookahead = this._board[convert2DIndexTo1D(i, j)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.topRight.push({ row: i, col: j });
+        }
+        break;
+      }
+      paths.topRight.push({ row: i, col: j });
+      if (singleStep) {
+        break;
+      }
+    }
+
+    // bottomLeft
+    (i = row), (j = col);
+    while (i < 8 && j > 1) {
+      i++;
+      j--;
+      const lookahead = this._board[convert2DIndexTo1D(i, j)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.bottomLeft.push({ row: i, col: j });
+        }
+        break;
+      }
+      paths.bottomLeft.push({ row: i, col: j });
+      if (singleStep) {
+        break;
+      }
+    }
+
+    // bottomRight
+    (i = row), (j = col);
+    while (i < 8 && j < 8) {
+      i++;
+      j++;
+      const lookahead = this._board[convert2DIndexTo1D(i, j)];
+      if (lookahead !== 0) {
+        if (lookahead.color !== cell.color) {
+          paths.bottomRight.push({ row: i, col: j });
+        }
+        break;
+      }
+      paths.bottomRight.push({ row: i, col: j });
+      if (singleStep) {
+        break;
+      }
+    }
+
     return paths;
   }
 
@@ -463,8 +538,6 @@ function selectCellString(cellString: string) {
 
 const newBoard = new Board();
 newBoard.arrangeBoard();
-newBoard._board[55] = 0;
-newBoard._board[45] = new Piece("king", "white");
 console.log(newBoard.drawBoard());
 console.log(newBoard.highlightedCell);
 
@@ -497,11 +570,5 @@ process.stdin.on("keypress", (_, key) => {
     console.log(newBoard.drawBoard());
     console.log(newBoard.highlightedCell);
     const selected = newBoard.selectedCell;
-    // if (selected) {
-    //   console.log(
-    //     "Selected Cell: ",
-    //     newBoard.rawBoard[convertIndex21(selected.row, selected.col)]
-    //   );
-    // }
   }
 });
