@@ -249,10 +249,59 @@ class Board {
       case "pawn":
         {
           const direction = cell.color === "white" ? 1 : -1;
-          if (!cell.hasMovedOnce) {
-            this._highlightedMoves.push({ row: row - 2 * direction, col });
+          let lookahead;
+          lookahead = this._board[convert2DIndexTo1D(row - 2 * direction, col)];
+          if (lookahead === 0) {
+            if (!cell.hasMovedOnce) {
+              this._highlightedMoves.push({ row: row - 2 * direction, col });
+            }
           }
-          this._highlightedMoves.push({ row: row - 1 * direction, col });
+          lookahead = this._board[convert2DIndexTo1D(row - 1 * direction, col)];
+          if (lookahead === 0) {
+            this._highlightedMoves.push({ row: row - 1 * direction, col });
+          }
+          const { topLeft, topRight, bottomLeft, bottomRight } =
+            this.calculatePaths(cell, this._selectedCell, true);
+          if (direction === 1) {
+            if (topLeft.length > 0) {
+              const topLeftCell =
+                this._board[convert2DIndexTo1D(topLeft[0].row, topLeft[0].col)];
+              if (topLeftCell !== 0 && topLeftCell.color !== cell.color) {
+                this._highlightedMoves.push(topLeft[0]);
+              }
+            }
+            if (topRight.length > 0) {
+              const topRightCell =
+                this._board[
+                  convert2DIndexTo1D(topRight[0].row, topRight[0].col)
+                ];
+              if (topRightCell !== 0 && topRightCell.color !== cell.color) {
+                this._highlightedMoves.push(topRight[0]);
+              }
+            }
+          } else {
+            if (bottomLeft.length > 0) {
+              const bottomLeftCell =
+                this._board[
+                  convert2DIndexTo1D(bottomLeft[0].row, bottomLeft[0].col)
+                ];
+              if (bottomLeftCell !== 0 && bottomLeftCell.color !== cell.color) {
+                this._highlightedMoves.push(bottomLeft[0]);
+              }
+            }
+            if (bottomRight.length > 0) {
+              const bottomRightCell =
+                this._board[
+                  convert2DIndexTo1D(bottomRight[0].row, bottomRight[0].col)
+                ];
+              if (
+                bottomRightCell !== 0 &&
+                bottomRightCell.color !== cell.color
+              ) {
+                this._highlightedMoves.push(bottomRight[0]);
+              }
+            }
+          }
         }
         break;
       case "rook":
