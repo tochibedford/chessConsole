@@ -27,7 +27,7 @@ class Piece {
   private _color: IColor;
   private _notation: INotation;
   private _canJump: boolean = false;
-  private _hasMovedOnce: boolean = false;
+  hasMovedOnce: boolean = false;
 
   constructor(name: IName, color: IColor) {
     this._name = name;
@@ -89,10 +89,6 @@ class Piece {
 
   get canJump() {
     return this._canJump;
-  }
-
-  get hasMovedOnce() {
-    return this._hasMovedOnce;
   }
 }
 
@@ -308,6 +304,7 @@ class Board {
               }
             }
           }
+          cell.hasMovedOnce = true;
         }
         break;
       case "rook":
