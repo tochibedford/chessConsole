@@ -115,6 +115,10 @@ class Board {
     return this._selectedCell;
   }
 
+  get moveMode() {
+    return this._highlightedMoves.length > 0;
+  }
+
   arrangeBoard() {
     const arrangement: IName[] = [
       "rook",
@@ -226,7 +230,9 @@ class Board {
       this.deselectCells();
       return;
     }
-    if (this._board[index1D] !== 0) {
+    if (this.moveMode && this._selectedCell) {
+      this.move(this._selectedCell, this._highlightedCell);
+    } else if (this._board[index1D] !== 0) {
       this._selectedCell = { row, col };
       const cell =
         this._board[
@@ -405,6 +411,22 @@ class Board {
       default:
         break;
     }
+  }
+
+  move(from: IBoardCoordinate, to: IBoardCoordinate) {
+    const fromCell = convert2DIndexTo1D(from.row, from.col);
+    const toCell = convert2DIndexTo1D(to.row, to.col);
+
+    for (const highlightedMove of this._highlightedMoves) {
+      if (highlightedMove.row === to.row && highlightedMove.col === to.col) {
+        this._board[toCell] = this._board[fromCell];
+        this._board[fromCell] = 0;
+        this.deselectCells();
+        break;
+      }
+    }
+
+    this.deselectCells();
   }
 
   calculatePaths(
