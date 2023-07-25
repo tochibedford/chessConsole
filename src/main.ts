@@ -20,6 +20,7 @@ type INotation =
   | "Y"
   | "Z";
 type IBoardCoordinate = { row: number; col: number }; //1-indexed
+
 class Piece {
   private _score: number;
   private _name: IName;
@@ -282,15 +283,27 @@ class Board {
         break;
       case "knight":
         // above
-        this._highlightedMoves.push({ row: row - 2, col: col - 1 });
-        this._highlightedMoves.push({ row: row - 2, col: col + 1 });
-        this._highlightedMoves.push({ row: row - 1, col: col - 2 });
-        this._highlightedMoves.push({ row: row - 1, col: col + 2 });
-        //below
-        this._highlightedMoves.push({ row: row + 2, col: col + 1 });
-        this._highlightedMoves.push({ row: row + 2, col: col - 1 });
-        this._highlightedMoves.push({ row: row + 1, col: col - 2 });
-        this._highlightedMoves.push({ row: row + 1, col: col + 2 });
+        {
+          const positions: IBoardCoordinate[] = [
+            { row: row - 2, col: col - 1 },
+            { row: row - 2, col: col + 1 },
+            { row: row - 1, col: col - 2 },
+            { row: row - 1, col: col + 2 },
+            { row: row + 2, col: col + 1 },
+            { row: row + 2, col: col - 1 },
+            { row: row + 1, col: col - 2 },
+            { row: row + 1, col: col + 2 },
+          ];
+          positions.forEach((pos) => {
+            let lookahead = this._board[convert2DIndexTo1D(pos.row, pos.col)];
+            if (
+              lookahead === 0 ||
+              (!!lookahead && lookahead.color !== cell.color)
+            ) {
+              this._highlightedMoves.push(pos);
+            }
+          });
+        }
         break;
       case "queen":
         {
@@ -345,7 +358,7 @@ class Board {
     }
   }
 
-  calculatePaths<T>(
+  calculatePaths(
     cell: Piece,
     selectedCell: IBoardCoordinate,
     singleStep: boolean = false
