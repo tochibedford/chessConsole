@@ -720,3 +720,7 @@ process.stdin.on("keypress", (_, key) => {
     console.log("selected:", newBoard.selectedCell);
   }
 });
+
+// todo: improve piece notation on board maybe use a different color scheme
+// todo: add pawn ranking up move:
+// todo: add "game" mode e.g with board rotation.
