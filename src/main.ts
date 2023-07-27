@@ -144,7 +144,12 @@ class Board {
       for (let col = 1; col <= 8; col++) {
         const cellNumber = (row - 1) * 8 + col - 1;
         const cell = this._board[cellNumber];
-        let cellString = cell instanceof Piece ? cell.notation : `${cell}`;
+        let cellString: string = "0";
+        if (cell instanceof Piece) {
+          cellString = cell.notation;
+        } else {
+          cellString = cell.toString();
+        }
         if (cellString === "0") {
           cellString = " ";
         }
@@ -179,7 +184,21 @@ class Board {
           (cellNumber % 2 === 1 && row % 2 === 1) ||
           (cellNumber % 2 === 0 && row % 2 === 0)
         ) {
-          cellString = chalk.bgWhite(chalk.black(cellString));
+          cellString = chalk.bgHex("031B26")(cellString);
+        } else {
+          cellString = chalk.bgHex("F7F3F5")(cellString);
+        }
+        if (cell instanceof Piece) {
+          switch (cell.color) {
+            case "black":
+              cellString = chalk.hex("7D4F50")(cellString);
+              break;
+            case "white":
+              cellString = chalk.hex("93AAB4")(cellString);
+              break;
+            default:
+              break;
+          }
         }
         rowString += cellString;
         rowString += col !== 8 ? "" : "\n";
@@ -657,15 +676,15 @@ function cellStringWrap(cellString: string) {
 }
 
 function highlightCellString(cellString: string) {
-  return chalk.bold(chalk.bgRed(chalk.white(cellString)));
+  return chalk.bold(chalk.bgRed(cellString));
 }
 
 function highlightPossibleMove(cellString: string) {
-  return chalk.bgBlue(chalk.green(cellString));
+  return chalk.bgBlue(cellString);
 }
 
 function selectCellString(cellString: string) {
-  return chalk.bold(chalk.white(chalk.bgGreen(cellString)));
+  return chalk.bold(chalk.bgGreen(cellString));
 }
 
 const newBoard = new Board();
@@ -705,6 +724,5 @@ process.stdin.on("keypress", (_, key) => {
   }
 });
 
-// todo: improve piece notation on board maybe use a different color scheme
 // todo: add pawn ranking up move:
 // todo: add "game" mode e.g with board rotation.
