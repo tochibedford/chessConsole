@@ -446,10 +446,21 @@ class Board {
     const fromCell = convert2DIndexTo1D(from.row, from.col);
     const toCell = convert2DIndexTo1D(to.row, to.col);
 
+    const piece = this._board[fromCell];
+    const isCastling =
+      piece !== 0 && piece.name === "king" && Math.abs(from.col - to.col) === 2;
+
     for (const highlightedMove of this._highlightedMoves) {
       if (highlightedMove.row === to.row && highlightedMove.col === to.col) {
+        // check for castling
         this._board[toCell] = this._board[fromCell];
         this._board[fromCell] = 0;
+        if (isCastling) {
+          if (fromCell < toCell) {
+            this._board[toCell - 1] = this._board[toCell + 1];
+            this._board[toCell + 1] = 0;
+          }
+        }
         this.deselectCells();
         return true;
       }
