@@ -424,6 +424,7 @@ class Board {
 
           // castling
           if (!cell.hasMovedOnce) {
+            // right
             let piece: (typeof this._board)[number] = 0;
             for (let i = 1; col + i <= 8; i++) {
               piece = this._board[convert2DIndexTo1D(row, col + i)];
@@ -431,8 +432,19 @@ class Board {
                 break;
               }
             }
-            if (piece !== 0 && piece.name === "rook") {
+            if (piece !== 0 && piece.name === "rook" && !piece.hasMovedOnce) {
               this._highlightedMoves.push({ row: row, col: col + 2 });
+            }
+
+            //left
+            for (let i = 1; col - i >= 1; i++) {
+              piece = this._board[convert2DIndexTo1D(row, col - i)];
+              if (piece !== 0) {
+                break;
+              }
+            }
+            if (piece !== 0 && piece.name === "rook" && !piece.hasMovedOnce) {
+              this._highlightedMoves.push({ row: row, col: col - 2 });
             }
           }
         }
@@ -457,8 +469,13 @@ class Board {
         this._board[fromCell] = 0;
         if (isCastling) {
           if (fromCell < toCell) {
+            // right castle
             this._board[toCell - 1] = this._board[toCell + 1];
             this._board[toCell + 1] = 0;
+          } else if (fromCell > toCell) {
+            //left castle
+            this._board[toCell + 1] = this._board[toCell - 2];
+            this._board[toCell - 2] = 0;
           }
         }
         this.deselectCells();
