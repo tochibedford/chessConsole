@@ -227,8 +227,27 @@ class Board {
       return;
     }
     if (this.moveMode && this._selectedCell) {
-      this.move(this._selectedCell, this._highlightedCell);
+      // if in movemode
+      if (
+        this._selectedCell.row === this._highlightedCell.row &&
+        this._selectedCell.col === this._highlightedCell.col
+      ) {
+        this.deselectCells();
+        return;
+      }
+      const cell =
+        this._board[
+          convert2DIndexTo1D(this._selectedCell.row, this._selectedCell.col)
+        ];
+      const madeLegalMove = this.move(
+        this._selectedCell,
+        this._highlightedCell
+      );
+      if (madeLegalMove && cell !== 0) {
+        cell.hasMovedOnce = true;
+      }
     } else if (this._board[index1D] !== 0) {
+      // if seleceted cell from move has a piece
       this._selectedCell = { row, col };
       const cell =
         this._board[
@@ -304,7 +323,6 @@ class Board {
               }
             }
           }
-          cell.hasMovedOnce = true;
         }
         break;
       case "rook":
@@ -403,6 +421,20 @@ class Board {
             bottomLeft,
             bottomRight
           );
+
+          // castling
+          if (!cell.hasMovedOnce) {
+            let piece: (typeof this._board)[number] = 0;
+            for (let i = 1; col + i <= 8; i++) {
+              piece = this._board[convert2DIndexTo1D(row, col + i)];
+              if (piece !== 0) {
+                break;
+              }
+            }
+            if (piece !== 0 && piece.name === "rook") {
+              this._highlightedMoves.push({ row: row, col: col + 2 });
+            }
+          }
         }
         break;
       default:
@@ -419,11 +451,12 @@ class Board {
         this._board[toCell] = this._board[fromCell];
         this._board[fromCell] = 0;
         this.deselectCells();
-        break;
+        return true;
       }
     }
 
     this.deselectCells();
+    return false;
   }
 
   calculatePaths(
@@ -656,6 +689,6 @@ process.stdin.on("keypress", (_, key) => {
     }
     console.log(newBoard.drawBoard());
     console.log(newBoard.highlightedCell);
-    const selected = newBoard.selectedCell;
+    console.log("selected:", newBoard.selectedCell);
   }
 });
