@@ -6,26 +6,21 @@ process.stdin.setRawMode(true);
 
 type IName = "king" | "queen" | "knight" | "bishop" | "rook" | "pawn";
 type IColor = "white" | "black";
-type INotation =
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z";
+enum Notation {
+  king = "K",
+  queen = "Q",
+  rook = "R",
+  knight = "K",
+  pawn = "P",
+  bishop = "B",
+}
 type IBoardCoordinate = { row: number; col: number }; //1-indexed
 
 class Piece {
   private _score: number;
   private _name: IName;
   private _color: IColor;
-  private _notation: INotation;
+  private _notation: Notation;
   private _canJump: boolean = false;
   hasMovedOnce: boolean = false;
 
@@ -36,42 +31,31 @@ class Piece {
     switch (name) {
       case "king":
         this._score = Infinity;
-        this._notation = this._getNotation(name, "A", "U");
+        this._notation = Notation.king;
         break;
       case "queen":
         this._score = 10;
-        this._notation = this._getNotation(name, "B", "V");
+        this._notation = Notation.queen;
         break;
       case "rook":
         this._score = 5;
-        this._notation = this._getNotation(name, "C", "W");
+        this._notation = Notation.rook;
         break;
       case "knight":
         this._score = 3;
-        this._notation = this._getNotation(name, "D", "X");
+        this._notation = Notation.knight;
         this._canJump = true;
         break;
       case "bishop":
         this._score = 3;
-        this._notation = this._getNotation(name, "E", "Y");
+        this._notation = Notation.bishop;
         break;
       case "pawn":
         this._score = 1;
-        this._notation = this._getNotation(name, "F", "Z");
+        this._notation = Notation.pawn;
         break;
       default:
         throw Error("Invalid Chess Piece Name");
-    }
-  }
-
-  private _getNotation(name: IName, wName: INotation, bName: INotation) {
-    switch (this._color) {
-      case "white":
-        return wName;
-      case "black":
-        return bName;
-      default:
-        throw Error("Invalid Piece Color");
     }
   }
 
